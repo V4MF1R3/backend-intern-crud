@@ -1,5 +1,6 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 import models
 import schemas
 from passlib.context import CryptContext
@@ -22,13 +23,13 @@ async def create_user(db: AsyncSession, user: schemas.UserCreate):
 
 async def get_user_by_username(db: AsyncSession, username: str):
     result = await db.execute(
-        models.User.__table__.select().where(models.User.username == username)
+        select(models.User).where(models.User.username == username)
     )
     return result.scalars().first()
 
 async def get_user(db: AsyncSession, user_id: int):
     result = await db.execute(
-        models.User.__table__.select().where(models.User.id == user_id)
+        select(models.User).where(models.User.id == user_id)
     )
     return result.scalars().first()
 
@@ -40,12 +41,12 @@ async def create_post(db: AsyncSession, post: schemas.PostCreate, user_id: int):
     return db_post
 
 async def get_posts(db: AsyncSession):
-    result = await db.execute(models.Post.__table__.select())
+    result = await db.execute(select(models.Post))
     return result.scalars().all()
 
 async def get_post(db: AsyncSession, post_id: int):
     result = await db.execute(
-        models.Post.__table__.select().where(models.Post.id == post_id)
+        select(models.Post).where(models.Post.id == post_id)
     )
     return result.scalars().first()
 
@@ -67,7 +68,7 @@ async def delete_post(db: AsyncSession, post_id: int):
 
 async def like_post(db: AsyncSession, post_id: int, user_id: int):
     result = await db.execute(
-        models.Like.__table__.select().where(
+        select(models.Like).where(
             (models.Like.post_id == post_id) & (models.Like.user_id == user_id)
         )
     )
@@ -89,6 +90,6 @@ async def comment_post(db: AsyncSession, post_id: int, user_id: int, comment: sc
 
 async def get_comments(db: AsyncSession, post_id: int):
     result = await db.execute(
-        models.Comment.__table__.select().where(models.Comment.post_id == post_id)
+        select(models.Comment).where(models.Comment.post_id == post_id)
     )
     return result.scalars().all()
